@@ -7,30 +7,21 @@ const urlStruct = {
     'GET': {
         '/': htmlHandler.getIndex,
         '/style.css': htmlHandler.getCSS,
-
+        // /default -> all other 404
+        // /getusers
+        // /notReal
     },
     'HEAD': {
+        // /getusers
+        // /notReal
+
+    },
+    'POST':{
+        // /addUser
 
     }
 };
 
-const onRequest = (request, response) => {
-    const parsedUrl = url.parse(request.url);
-
-    if (!urlStruct[request.method]) {
-        urlStruct['HEAD'].notFound(request, response);
-    };
-
-    const methodHandlers = urlStruct[request.mehtod];
-    const handlerFunc = urlStruct[parsedUrl.pathname];
-    if (handlerFunc) {
-        handlerFunc(request, response);
-    }
-    else {
-        urlStruct[request.method].notFound(request, response);
-    }
-};
-
-http.createServer(onRequest).listen(port, () => {
-    console.log(`Listening on 127.0.0.1: ${port}`);
-});
+// http.createServer(onRequest).listen(port, () => {
+//     console.log(`Listening on 127.0.0.1: ${port}`);
+// });
