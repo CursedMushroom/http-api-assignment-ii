@@ -1,13 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <title>Our simple HTTP server</title>
   <link rel="stylesheet" type="text/css" href="/style.css">
-  
+
   <script>
+    const handleResponse = async (response, parseResponse) => {
+      const content = document.querySelector('#content');
+      content.innerHTML = `<p></p>`
+      if (parseResponse) {
+        const obj = await response.json();
+        content.innerHTML += `<p>${JSON.stringify(obj)}</p>`
+      } else {
+        content.innerHTML += `<p> Meta Data Recieved</p>`;
+      }
+    };
+
+    const requestUpdate = async (form) => {
+      const url = form.querySelector('#urlField').value;
+      const method = document.querySelector('#methodSelect').value;
+
+      let response = await fetch(url, {
+        method,
+        headers: {
+          'Accept': 'application/json'
+        },
+      });
+
+      handleResponse(response, method === 'get');
+    };
+    const sendPost = async (nameForm) => {
+      const nameAction = nameForm.getAttribute('action');
+      const nameMethod = nameForm.getAttribute('method');
+
+      const nameField = nameForm.querySelector('#nameField');
+      const ageField = nameForm.querySelector('#ageField');
+
+      const formData = `name=${nameField.value}&age=${ageField.value}`;
+
+      let response = await fetch(nameAction, {
+        method: nameMethod,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json',
+        },
+        body: formData,
+      });
+      handleResponse(response);
+    };
+
+
+    const init = () => {
+      const userForm = document.querySelector('#userForm');
+      const nameForm = document.querySelector('#nameForm');
+      const addUserButton = document.querySelector('#addUser');;
+
+      const userFormSumbit = (e) => {
+        e.preventDefault();
+        requestUpdate(userForm);
+
+        return false;//prevents event bubbling
+      };
+
+      const nameFormSumbit = (e) => {
+        e.preventDefault();
+        sendPost(nameForm);
+
+        return false;//prevents event bubbling
+      };
+      userForm.addEventListener('submit', userFormSumbit);
+      nameForm.addEventListener('submit', nameFormSumbit);
+
+    };
+
+
+
+    window.onload = init;
 
   </script>
 </head>
+
 <body>
   <section id="top">
     <h3>POST Status Code Tests</h3>
@@ -15,7 +88,7 @@
       <label for="name">Name: </label>
       <input id="nameField" type="text" name="name" />
       <label for="age">Age: </label>
-      <input id="ageField" type="number" name="age" min="0" max="100" step="1"/>
+      <input id="ageField" type="number" name="age" min="0" max="100" step="1" />
       <input type="submit" value="Add User" />
     </form>
     <form id="userForm" action="/getUsers" method="get">
@@ -33,4 +106,5 @@
   <section id="content">
   </section>
 </body>
+
 </html>
